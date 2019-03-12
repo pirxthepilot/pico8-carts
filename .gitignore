@@ -1,5 +1,7 @@
 *.swp
+*.txt
 *.zip
 *.png
 */demos/
+*/bbs/
 */archive/
