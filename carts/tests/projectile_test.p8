@@ -7,12 +7,20 @@ function _init()
 	parts={}
 	for i=0,15 do
 		local r_maxdy=rnd(2)
+		local r_maxage=rndrange(r_maxdy*20,r_maxdy*50)
 		local r_angle=rndangle(135,90)
-		make_part(31,oy,0,0,r_maxdy,r_angle,i)
+		make_part(31,oy,0,0,r_maxdy,r_maxage,r_angle,i)
 	end
 end
 
 function _update()
+	for i=0,1 do
+		local r_maxdy=rnd(2)
+		local r_maxage=rndrange(r_maxdy*20,r_maxdy*40)
+		local r_angle=rndangle(135,90)
+		local r_color=rnd(15)
+		make_part(31,oy,0,0,r_maxdy,r_maxage,r_angle,r_color)
+	end
 	for i in all(parts) do
 		update_part(i)
 	end
@@ -27,13 +35,15 @@ function _draw()
 end
 -->8
 -- particles
-function make_part(_x,_y,_dx,_dy,_maxdy,_a_rot,_col)
+function make_part(_x,_y,_dx,_dy,_maxdy,_maxage,_a_rot,_col)
 	add(parts, {
 		x=_x,
 		y=_y,
 		dx=_dx,
 		dy=_dy,
 		maxdy=_maxdy,
+		age=0,
+		maxage=_maxage,
 		a_rot=_a_rot,
 		up=true,
 		col=_col
@@ -41,6 +51,10 @@ function make_part(_x,_y,_dx,_dy,_maxdy,_a_rot,_col)
 end
 
 function update_part(p)
+	if p.age>=p.maxage then
+		del(parts,p)
+		return
+	end
 	if p.up then
 		if p.dy>-p.maxdy then
 			p.dy-=grav
@@ -48,15 +62,11 @@ function update_part(p)
 			p.up=false
 		end
 	else
-		if p.dy<p.maxdy then
-			p.dy+=grav
-		else
-			p.up=true
-		end
+		p.dy+=grav
 	end
 	p.y+=p.dy
-	p.x+=grav*cos(a_rot)
-	//p.x+=cos(a_rot)
+	p.x+=grav*1.5*cos(a_rot)
+	p.age+=1
 end
 
 function draw_part(p)
@@ -86,4 +96,11 @@ function rndangle(_r,_l)
 	local l=rotval(_l)
 	local diff=rotdiff(r,l)
 	return (l+(rnd()*diff))%1
+end
+
+-- random number from a range
+function rndrange(lower,upper)
+	local interval=upper-lower+1
+	local r=flr(rnd(interval))
+	return r+lower
 end
