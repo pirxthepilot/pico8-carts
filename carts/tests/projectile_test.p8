@@ -4,19 +4,40 @@ __lua__
 function _init()
 	grav=0.1
 	oy=80
-	parts={}
-	veins={}
 	lava_cols={7,8,9,10}
+	parts={}
+	veinsets={}
+	make_veinset(61,oy,3)
+	make_veinset(62,oy,3)
+	make_veinset(63,oy,3)
+	make_veinset(64,oy,3)
+	make_veinset(65,oy,3)
 end
 
 function _update()
-	for i=0,1 do
-		local r_maxdy=rnd(2)
-		local r_maxage=rndrange(r_maxdy*20,r_maxdy*40)
-		local r_angle=rndangle(285,255)
-		local r_color=lava_cols[flr(rnd(#lava_cols))+1]
-		make_part(31,oy,0,0,r_maxdy,r_maxage,r_angle,r_color)
+	-- for i=0,1 do
+	-- 	local r_maxdy=rnd(2)
+	-- 	local r_maxage=rndrange(r_maxdy*20,r_maxdy*40)
+	-- 	local r_angle=rndangle(285,255)
+	-- 	local r_color=lava_cols[flr(rnd(#lava_cols))+1]
+	-- 	make_part(31,oy,0,0,r_maxdy,r_maxage,r_angle,r_color)
+	-- end
+
+	for i in all(veinsets) do
+		-- lava vein and particle creation
+		if #i.veins<i.count then
+			make_vein(i.veins,i.x,i.y)
+		end
+		--if #veins<vein_count then
+		--	make_vein(31,oy)
+		--end
+		-- update veins
+		for j in all(i.veins) do
+			update_vein(i.veins,j)
+		end
 	end
+
+	-- update lava particles
 	for i in all(parts) do
 		update_part(i)
 	end
@@ -67,20 +88,38 @@ function update_part(p)
 end
 
 function draw_part(p)
-	//print('x:'..p.x..' y:'..p.y)
 	pset(p.x,p.y,p.col)
 end
 -->8
 -- lava veins
-function make_vein(_x,_y)
-	add(veins, {
+function make_vein(_vein,_x,_y)
+	local r_maxdy=rnd(2)
+	add(_vein, {
 		x=_x,
 		y=_y,
 		len=rndrange(1,10),
-		maxdy=rnd(2),
+		maxdy=r_maxdy,
 		maxage=rndrange(r_maxdy*20,r_maxdy*40),
 		angle=rndangle(285,255),
 		color=lava_cols[flr(rnd(#lava_cols))+1]
+	})
+end
+
+function update_vein(_veins,v)
+	if v.len==0 then
+		del(_veins,v)
+		return
+	end
+	make_part(v.x,v.y,0,0,v.maxdy,v.maxage,v.angle,v.color)
+	v.len-=1
+end
+
+function make_veinset(_x,_y,_count)
+	add(veinsets, {
+		x=_x,
+		y=_y,
+		count=_count,
+		veins={}
 	})
 end
 
