@@ -5,20 +5,16 @@ function _init()
 	grav=0.1
 	oy=80
 	parts={}
-	for i=0,15 do
-		local r_maxdy=rnd(2)
-		local r_maxage=rndrange(r_maxdy*20,r_maxdy*50)
-		local r_angle=rndangle(135,90)
-		make_part(31,oy,0,0,r_maxdy,r_maxage,r_angle,i)
-	end
+	veins={}
+	lava_cols={7,8,9,10}
 end
 
 function _update()
 	for i=0,1 do
 		local r_maxdy=rnd(2)
 		local r_maxage=rndrange(r_maxdy*20,r_maxdy*40)
-		local r_angle=rndangle(135,90)
-		local r_color=rnd(15)
+		local r_angle=rndangle(285,255)
+		local r_color=lava_cols[flr(rnd(#lava_cols))+1]
 		make_part(31,oy,0,0,r_maxdy,r_maxage,r_angle,r_color)
 	end
 	for i in all(parts) do
@@ -34,7 +30,7 @@ function _draw()
 	end
 end
 -->8
--- particles
+-- lava particles
 function make_part(_x,_y,_dx,_dy,_maxdy,_maxage,_a_rot,_col)
 	add(parts, {
 		x=_x,
@@ -65,7 +61,8 @@ function update_part(p)
 		p.dy+=grav
 	end
 	p.y+=p.dy
-	p.x+=grav*1.5*cos(a_rot)
+	p.dx+=grav*cos(p.a_rot)
+	p.x+=p.dx
 	p.age+=1
 end
 
@@ -73,6 +70,20 @@ function draw_part(p)
 	//print('x:'..p.x..' y:'..p.y)
 	pset(p.x,p.y,p.col)
 end
+-->8
+-- lava veins
+function make_vein(_x,_y)
+	add(veins, {
+		x=_x,
+		y=_y,
+		len=rndrange(1,10),
+		maxdy=rnd(2),
+		maxage=rndrange(r_maxdy*20,r_maxdy*40),
+		angle=rndangle(285,255),
+		color=lava_cols[flr(rnd(#lava_cols))+1]
+	})
+end
+
 -->8
 -- helper functions
 
