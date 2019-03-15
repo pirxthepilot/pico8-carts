@@ -2,27 +2,14 @@ pico-8 cartridge // http://www.pico-8.com
 version 16
 __lua__
 function _init()
-	grav=0.1
-	oy=80
-	lava_cols={7,8,9,10}
-	parts={}
-	veinsets={}
-	make_veinset(61,oy,3)
-	make_veinset(62,oy,3)
-	make_veinset(63,oy,3)
-	make_veinset(64,oy,3)
-	make_veinset(65,oy,3)
+	lava_init()
+	make_veinset(61,oy,veinset_count)
+	make_veinset(62,oy,veinset_count)
+	make_veinset(63,oy,veinset_count)
 end
 
 function _update()
-	-- for i=0,1 do
-	-- 	local r_maxdy=rnd(2)
-	-- 	local r_maxage=rndrange(r_maxdy*20,r_maxdy*40)
-	-- 	local r_angle=rndangle(285,255)
-	-- 	local r_color=lava_cols[flr(rnd(#lava_cols))+1]
-	-- 	make_part(31,oy,0,0,r_maxdy,r_maxage,r_angle,r_color)
-	-- end
-
+	-- veinsets and veins
 	for i in all(veinsets) do
 		-- lava vein and particle creation
 		if #i.veins<i.count then
@@ -46,11 +33,22 @@ end
 function _draw()
 	cls()
 	rectfill(0,oy,127,oy+2,10)
-	for i in all(parts) do
-		draw_part(i)
-	end
+	lava_draw()
 end
 -->8
+-- lava
+-- lava init
+function lava_init()
+	grav=0.1
+	oy=80
+	lava_cols={8,9,10}
+	parts={}
+	veinsets={}
+	veinset_count=8
+	min_vein_len=2
+	max_vein_len=10
+end
+
 -- lava particles
 function make_part(_x,_y,_dx,_dy,_maxdy,_maxage,_a_rot,_col)
 	add(parts, {
@@ -97,7 +95,7 @@ function make_vein(_vein,_x,_y)
 	add(_vein, {
 		x=_x,
 		y=_y,
-		len=rndrange(1,10),
+		len=rndrange(min_vein_len,max_vein_len),
 		maxdy=r_maxdy,
 		maxage=rndrange(r_maxdy*20,r_maxdy*40),
 		angle=rndangle(285,255),
@@ -121,6 +119,13 @@ function make_veinset(_x,_y,_count)
 		count=_count,
 		veins={}
 	})
+end
+
+-- Draw the lava particles
+function lava_draw()
+	for i in all(parts) do
+		draw_part(i)
+	end
 end
 
 -->8
