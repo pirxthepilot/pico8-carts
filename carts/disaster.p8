@@ -2,7 +2,9 @@ pico-8 cartridge // http://www.pico-8.com
 version 16
 __lua__
 function _init()
+	-- starting y
 	map_y=33
+
 	-- lava
 	lava_init()
 	oy=map_y+32
@@ -19,6 +21,9 @@ function _init()
 
 	-- help!
 	make_help(12)
+
+	-- instructions
+	make_text()
 
 	-- volcano sound
 	sfx(0)
@@ -49,10 +54,14 @@ function _update()
 	
 	-- help!
 	help_update()
+	
+	-- instructions
+	text_update()
 end
 
 function _draw()
 	cls()
+	text_draw()
 	magma_draw()
 	backdrop_draw()
 	lava_draw()
@@ -264,11 +273,13 @@ function make_char(_x,_y)
 		dx=0,
 		maxdx=2,
 		acc=0.5,		--walk accel
-		frc=0.6,		--walk friction
-		s={},     --sprites
-		sid=1,				--sprite index
+		frc=0.65,		--walk friction
+		s={},     		--sprites
+		sid=1,			--sprite index
 		sdly=4,			--dly bet frames
 		stime=0,
+		w=2,
+		h=2,
 	}
 end
 
@@ -281,29 +292,28 @@ function char_update()
 		if char.dx>-char.maxdx then
 			char.dx-=char.acc
 		end
-		char.x+=char.dx
 		char.s=s_left
-		char_anim()
 	elseif btn(1) then
 		if char.dx<char.maxdx then
 			char.dx+=char.acc
 		end
-		char.x+=char.dx
 		char.s=s_right
-		char_anim()
 	else
 		if char.dx!=0 then
 			char.dx*=char.frc
-			char.x+=char.dx
 		end
 		char.s=s_stand
-		char_anim()
 	end
+	if not on_edge() then
+		char.x+=char.dx
+	else
+		char.dx=0
+	end
+	char_anim()
 end
 
 function char_draw()
-	print(char.dx)
-	spr(char.s[char.sid],char.x,char.y,2,2)
+	spr(char.s[char.sid],char.x,char.y,char.w,char.h)
 end
 
 function char_anim()
@@ -316,6 +326,44 @@ function char_anim()
 		else
 			char.sid=1
 		end
+	end
+end
+-->8
+-- text instructions
+function make_text()
+	text={
+		start_y=0,
+		w={
+			"\139 \145 to run!",
+			"\142 to cry"
+		},
+		pressed=false,
+	}
+end
+
+function text_update()
+	if btn(0) or btn(1) or btn(4) then
+		text.pressed=true
+	end
+end
+
+function text_draw()
+	if not text.pressed then
+		for i=1,#text.w do
+			local ind=64-#text.w[i]*2
+			print(text.w[i],ind,text.start_y+(i*8)-8)
+		end
+	end
+end
+
+function on_edge()
+	if
+		(char.x<0 and not btn(1)) or
+		(char.x+(char.w*8)>127 and not btn(0))
+	then
+		return true
+	else
+		return false
 	end
 end
 __gfx__
