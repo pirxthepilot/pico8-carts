@@ -11,7 +11,7 @@ function _init()
 	make_veinset(55,oy,veinset_count)
 	make_veinset(56,oy,veinset_count)
 	make_veinset(57,oy,veinset_count)
- make_veinset(58,oy,veinset_count)
+ 	make_veinset(58,oy,veinset_count)
 
 	-- magma
 	magma_init(40,56+map_y,0.2)
