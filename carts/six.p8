@@ -2,7 +2,7 @@ pico-8 cartridge // http://www.pico-8.com
 version 16
 __lua__
 function _init()
-	widescreen=false
+	widescreen=true
 	main_x=0
 	main_spd=1
 	mtn_x=0
